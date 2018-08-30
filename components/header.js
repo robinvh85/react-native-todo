@@ -4,11 +4,11 @@ import {StyleSheet, View, Text, Image} from 'react-native';
 
 class Header extends React.Component {
   render() {
-    let menuIcon = require("../images/icons/ui-menu.png");
+    let menuIcon = require("../images/icons/menu1.png");
 
     return (
       <View style={styles.container}>
-        <Image source={menuIcon} style={{width: 30, height: 30}}/>
+        <Image source={menuIcon} style={{width: 30, height: 30, marginLeft: 5}}/>
         <View style={styles.title}>
           <Text>Header 1</Text>
         </View>
@@ -22,7 +22,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     flexDirection: "row",
     height: 40,
-    backgroundColor: "#81d4fa",
+    backgroundColor: "#4fc3f7",
     alignItems: "center"
   },
   title: {
