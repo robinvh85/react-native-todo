@@ -4,8 +4,6 @@ import { StyleSheet, View, Text, Image, TouchableOpacity, Alert } from 'react-na
 export default class Item extends React.Component {
 
   onPress = (item) => {
-    // Alert.alert("Clicked");
-    debugger;
     this.props.onRemove(item);
   }
 

@@ -11,6 +11,7 @@ export default class CreateItem extends React.Component {
   onPress() {
     // Alert.alert(this.state.text);
     this.props.onAdd(this.state.content);
+    this.setState({content: ''})
   }
 
   render() {

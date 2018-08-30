@@ -2,14 +2,16 @@ import React from 'react';
 import { StyleSheet, View, FlatList, Text } from 'react-native';
 import Item from "../components/item";
 
-export default class ItemList extends React.Component {
+import { connect } from 'react-redux';
+
+class ItemList extends React.Component {
 
   onRemove(item) {
-    debugger;
     this.props.onRemove(item);
   }
 
   render() {
+    console.log(this.props);
 
     return (
       <View style={styles.container}>
@@ -30,3 +32,10 @@ const styles = StyleSheet.create({
     margin: 10
   }
 });
+
+export default connect(state => {
+  console.log(state);
+  return {
+    list: state.data
+  }
+})(ItemList);

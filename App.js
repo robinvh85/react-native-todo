@@ -4,34 +4,83 @@ import Header from "./components/header";
 import CreateItem from "./components/createItem";
 import ItemList from "./components/itemList";
 
+import {createStore} from "redux";
+import {Provider} from "react-redux";
+
+// State
+let appState = {
+  data: [{
+    content: "Task 1",
+    isFinished: true
+  }, {
+    content: "Task 2",
+    isFinished: true
+  }]
+};
+
+// Action
+const finishTask = (index) => {
+  return {
+    type: "FINISH",
+    atIndex: index
+  };
+}
+
+const deleteTask = (index) => {
+  return {
+    type: "DELETE",
+    atIndex: index
+  };
+}
+
+// Reducer
+const taskListReducer = (state = appState, action) => {
+  let newTaskList = state.data;
+  
+  switch(action.type){
+    case "FINISH":
+      newTaskList[action.atIndex].isFinished = true;
+      return {...state, data: newTaskList};
+    case "DELETE":
+      newTaskList = state.data.filter((item, i) => i !== action.atIndex);
+      return {...state, data: newTaskList};
+  }
+
+  return state;
+}
+
+// Store
+console.log("STATE", appState);
+const store = createStore(taskListReducer, appState);
+console.log("STORE", store.getState());
+
 export default class App extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {listTasks: [{
-      content: "Task 1"
-    }, {
-      content: "Task 2"
-    }]};
+    this.state = appState;
   }
 
   onAdd(value) {
-    let listTasks = [...this.state.listTasks, {content: value}];
-    this.setState({listTasks});
+    let data = [...this.state.data, {content: value}];
+    this.setState({data});
   }
 
   onRemove(value){
-    debugger;
     Alert.alert(value.content);
   }
 
   render() {
+    
     return (
-      <View style={styles.container}>
-        <Header />
-        <CreateItem onAdd={this.onAdd.bind(this)} />
-        <ItemList list={this.state.listTasks} onRemove={this.onRemove.bind(this)}/>
-      </View>
+      <Provider store={ store }>
+        <View style={styles.container}>
+          <Header />
+          <CreateItem onAdd={this.onAdd.bind(this)} />
+          {/* <ItemList list={this.state.data} onRemove={this.onRemove.bind(this)}/> */}
+          <ItemList />
+        </View>
+      </Provider>
     );
   }
 }
