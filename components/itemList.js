@@ -5,20 +5,16 @@ import Item from "../components/item";
 import { connect } from 'react-redux';
 
 class ItemList extends React.Component {
-
-  onRemove(item) {
-    this.props.onRemove(item);
-  }
-
   render() {
-    console.log(this.props);
+
+    const { onFinishItem } = this.props;
 
     return (
       <View style={styles.container}>
         <FlatList
           data={this.props.list}
           renderItem={
-            ({item}) => <Item taskName={item.content} onRemove={this.onRemove.bind(this)}/>
+            ({item, index}) => <Item data={item} index={index} onFinishItem={ () => onFinishItem(index) }  />
           }
           keyExtractor={(item, index) => index.toString()}
         />
@@ -33,9 +29,25 @@ const styles = StyleSheet.create({
   }
 });
 
-export default connect(state => {
-  console.log(state);
+// Action
+const finishTask = (index) => {
+  return {
+    type: "FINISH",
+    atIndex: index
+  };
+}
+
+const mapDispatchToProp = (dispatch) => {
+  return {
+    onFinishItem: (index) => dispatch( finishTask(index) )
+  }
+}
+
+const mapStateToProp = (state) => {
   return {
     list: state.data
   }
-})(ItemList);
+}
+
+// // the connect function that glue our component to the Redux store
+export default connect(mapStateToProp, mapDispatchToProp)(ItemList);

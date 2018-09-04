@@ -1,8 +1,7 @@
 import React from 'react';
 import {StyleSheet, View, TextInput, Image, TouchableOpacity, Alert} from 'react-native';
-import { connect } from 'react-redux';
 
-class CreateItem extends React.Component {
+export default class CreateItem extends React.Component {
 
   constructor(props){
     super(props);
@@ -10,7 +9,7 @@ class CreateItem extends React.Component {
   }
 
   onPress() {
-    this.props.addItem({ content: this.state.content, isFinished: false });
+    this.props.onAdd(this.state.content);
     this.setState({content: ''})
   }
 
@@ -34,28 +33,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     height: 40,
+    // backgroundColor: "red",
     alignItems: "center",
     margin: 10
   }
 })
-
-// Action
-const addItem = (newItem) => {
-  return {
-    type: "ADD",
-    newItem: newItem
-  }
-}
-
-const mapStateToProps = (state) => {
-  return {
-  }
-}
-
-const mapDispatchToProps = (dispatch) => {
-  return {
-    addItem: (newItem) => dispatch( addItem(newItem) )
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(CreateItem)

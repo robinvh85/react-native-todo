@@ -4,80 +4,69 @@ import Header from "./components/header";
 import CreateItem from "./components/createItem";
 import ItemList from "./components/itemList";
 
-import {createStore} from "redux";
+import {createStore, applyMiddleware} from "redux";
 import {Provider} from "react-redux";
+import thunk from "redux-thunk";
 
 // State
 let appState = {
-  data: [{
-    content: "Task 1",
-    isFinished: true
-  }, {
-    content: "Task 2",
-    isFinished: true
-  }]
+  data: []
 };
-
-// Action
-const finishTask = (index) => {
-  return {
-    type: "FINISH",
-    atIndex: index
-  };
-}
-
-const deleteTask = (index) => {
-  return {
-    type: "DELETE",
-    atIndex: index
-  };
-}
 
 // Reducer
 const taskListReducer = (state = appState, action) => {
-  let newTaskList = state.data;
+  let newTaskList = [...state.data];
   
   switch(action.type){
     case "FINISH":
-      newTaskList[action.atIndex].isFinished = true;
-      return {...state, data: newTaskList};
+      newTaskList = state.data.filter((item, i) => true);
+      newTaskList[action.atIndex].isFinished = !newTaskList[action.atIndex].isFinished; 
+      return { ...state, data: newTaskList };
     case "DELETE":
       newTaskList = state.data.filter((item, i) => i !== action.atIndex);
       return {...state, data: newTaskList};
+    case "ADD":
+      newTaskList.push(action.newItem);
+      return { ...state, data: newTaskList };
+    case "INIT_DATA":
+      return { ...state, data: action.data };
   }
 
   return state;
 }
 
-// Store
-console.log("STATE", appState);
-const store = createStore(taskListReducer, appState);
-console.log("STORE", store.getState());
+// Middleware
+const logger = store => next => action => {
+  console.log("LOGGER State: ", store.getState());
+  const data = store.getState().data;
+
+  if(data.length > 1){
+    next(action);
+  } else if(data.length == 1){
+    Alert.alert("Can not delete this item");
+    return;
+  }
+  
+  next(action);
+  console.log("LOGGER State after: ", store.getState());
+}
+
+// // Store
+const store = createStore(taskListReducer, applyMiddleware(thunk,logger));
+// console.log("STORE", store.getState());
 
 export default class App extends React.Component {
-
   constructor(props) {
     super(props);
     this.state = appState;
   }
 
-  onAdd(value) {
-    let data = [...this.state.data, {content: value}];
-    this.setState({data});
-  }
-
-  onRemove(value){
-    Alert.alert(value.content);
-  }
-
   render() {
-    
     return (
       <Provider store={ store }>
         <View style={styles.container}>
           <Header />
-          <CreateItem onAdd={this.onAdd.bind(this)} />
-          {/* <ItemList list={this.state.data} onRemove={this.onRemove.bind(this)}/> */}
+          <CreateItem />
           <ItemList />
         </View>
       </Provider>
@@ -93,3 +82,29 @@ const styles = StyleSheet.create({
     // justifyContent: 'center',
   },
 });
+
+// Action
+const initData = (data) => {
+  return {
+    type: "INIT_DATA",
+    data: data
+  }
+} 
+
+const addDataAfter3s = () => {
+  return () => {
+    setTimeout( () => {
+      let data = [{
+        content: "Task 1",
+        isFinished: true
+      }, {
+        content: "Task 2",
+        isFinished: false
+      }];
+
+      store.dispatch(initData(data));
+    }, 3000 );
+  }
+}
+
+store.dispatch( addDataAfter3s() );
